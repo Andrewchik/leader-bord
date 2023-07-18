@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 
 import { UserItem } from './UserItem/UserItem';
 import { Color } from "../../enum/color.enum";
@@ -12,12 +12,12 @@ const Leaderboard: React.FC = () => {
     const leaderboardRef = useRef<HTMLDivElement>(null);
     const [initialMilliseconds, setInitialMilliseconds] = useState(15000);
 
-    const convertTimeToMilliseconds = useCallback((time: string) => {
+    const convertTimeToMilliseconds = (time: string) => {
         const [minutes, seconds, milliseconds] = time.split(/[:.]/).map(Number);
         return minutes * 60 * 1000 + seconds * 1000 + milliseconds;
-    }, []);
+    };
 
-    const getRandomWord = useCallback(() => {
+    const getRandomWord = () => {
         const length = Math.floor(Math.random() * 10) + 1;
         const characters = 'abcdefghijklmnopqrstuvwxyz';
         let word = '';
@@ -28,7 +28,7 @@ const Leaderboard: React.FC = () => {
         }
 
         return word;
-    }, []);
+    };
 
     const getRandomTime = useCallback(() => {
         const minutes = Math.floor(initialMilliseconds / 60000);
@@ -44,48 +44,11 @@ const Leaderboard: React.FC = () => {
         return `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
     }, [initialMilliseconds]);
 
-    const getRandomColor = useCallback(() => {
+    const getRandomColor = () => {
         const colors = [Color.RED, Color.GREEN, Color.BLUE];
         const randomIndex = Math.floor(Math.random() * colors.length);
         return colors[randomIndex];
-    }, []);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (leaderboardRef.current) {
-                const { scrollTop, scrollHeight, clientHeight } = leaderboardRef.current;
-                if (scrollTop + clientHeight >= scrollHeight) {
-                    setIsLoading(true);
-                    setTimeout(() => {
-                        const newUsers: User[] = [];
-                        const startIndex = users.length;
-                        const endIndex = startIndex + 50;
-                        for (let i = startIndex; i < endIndex; i++) {
-                            const user: User = {
-                                color: getRandomColor(),
-                                name: getRandomWord(),
-                                speed: Math.random() * 100,
-                                time: getRandomTime(),
-                            };
-                            newUsers.push(user);
-                        }
-                        setUsers((prevUsers) => [...prevUsers, ...newUsers]);
-                        setIsLoading(false);
-                    }, 2000);
-                }
-            }
-        };
-
-        const currentRef = leaderboardRef.current;
-        if (currentRef) {
-            currentRef.addEventListener('scroll', handleScroll);
-        }
-        return () => {
-            if (currentRef) {
-                currentRef.removeEventListener('scroll', handleScroll);
-            }
-        };
-    }, [getRandomColor, getRandomTime, getRandomWord, users]);
+    };
 
     useEffect(() => {
         setTimeout(() => {
@@ -108,7 +71,44 @@ const Leaderboard: React.FC = () => {
             setUsers(generatedUsers);
             setIsLoading(false);
         }, 2000);
-    }, [convertTimeToMilliseconds, getRandomColor, getRandomTime, getRandomWord]);
+    }, []);
+
+    const handleScroll = useCallback(() => {
+        if (leaderboardRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = leaderboardRef.current;
+            if (scrollTop + clientHeight >= scrollHeight) {
+                setIsLoading(true);
+                setTimeout(() => {
+                    const newUsers: User[] = [];
+                    const startIndex = users.length;
+                    const endIndex = startIndex + 50;
+                    for (let i = startIndex; i < endIndex; i++) {
+                        const user: User = {
+                            color: getRandomColor(),
+                            name: getRandomWord(),
+                            speed: Math.random() * 100,
+                            time: getRandomTime(),
+                        };
+                        newUsers.push(user);
+                    }
+                    setUsers((prevUsers) => [...prevUsers, ...newUsers]);
+                    setIsLoading(false);
+                }, 2000);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        const currentRef = leaderboardRef.current;
+        if (currentRef) {
+            currentRef.addEventListener('scroll', handleScroll);
+        }
+        return () => {
+            if (currentRef) {
+                currentRef.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, []);
 
     return (
         <div className="leaderboard" ref={leaderboardRef}>
