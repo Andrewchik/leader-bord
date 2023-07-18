@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 
 import { UserItem } from './UserItem/UserItem';
 import { Color } from "../../enum/color.enum";
@@ -30,7 +30,13 @@ const Leaderboard: React.FC = () => {
         return word;
     };
 
-    const getRandomTime = useCallback(() => {
+    const getRandomColor = () => {
+        const colors = [Color.RED, Color.GREEN, Color.BLUE];
+        const randomIndex = Math.floor(Math.random() * colors.length);
+        return colors[randomIndex];
+    };
+
+    const getRandomTime = () => {
         const minutes = Math.floor(initialMilliseconds / 60000);
         const seconds = Math.floor((initialMilliseconds % 60000) / 1000);
         const milliseconds = initialMilliseconds % 1000;
@@ -42,16 +48,11 @@ const Leaderboard: React.FC = () => {
         setInitialMilliseconds((prevMilliseconds) => prevMilliseconds + 500); // Update initialMilliseconds value
 
         return `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
-    }, [initialMilliseconds]);
-
-    const getRandomColor = () => {
-        const colors = [Color.RED, Color.GREEN, Color.BLUE];
-        const randomIndex = Math.floor(Math.random() * colors.length);
-        return colors[randomIndex];
     };
 
-// eslint-disable-next-line react-hooks/exhaustive-deps
+
     useEffect(() => {
+
         setTimeout(() => {
             const generatedUsers: User[] = [];
             for (let i = 0; i < 50; i++) {
@@ -72,37 +73,37 @@ const Leaderboard: React.FC = () => {
             setUsers(generatedUsers);
             setIsLoading(false);
         }, 2000);
-    }, []);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const handleScroll = useCallback(() => {
-        if (leaderboardRef.current) {
-            const { scrollTop, scrollHeight, clientHeight } = leaderboardRef.current;
-            if (scrollTop + clientHeight >= scrollHeight) {
-                setIsLoading(true);
-                setTimeout(() => {
-                    const newUsers: User[] = [];
-                    const startIndex = users.length;
-                    const endIndex = startIndex + 50;
-                    for (let i = startIndex; i < endIndex; i++) {
-                        const user: User = {
-                            color: getRandomColor(),
-                            name: getRandomWord(),
-                            speed: Math.random() * 100,
-                            time: getRandomTime(),
-                        };
-                        newUsers.push(user);
-                    }
-                    setUsers((prevUsers) => [...prevUsers, ...newUsers]);
-                    setIsLoading(false);
-                }, 2000);
-            }
-        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
-// eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
+        const handleScroll = () => {
+
+
+            if (leaderboardRef.current) {
+                const { scrollTop, scrollHeight, clientHeight } = leaderboardRef.current;
+                if (scrollTop + clientHeight >= scrollHeight) {
+                    setIsLoading(true);
+                    setTimeout(() => {
+                        const newUsers: User[] = [];
+                        const startIndex = users.length;
+                        const endIndex = startIndex + 50;
+                        for (let i = startIndex; i < endIndex; i++) {
+                            const user: User = {
+                                color: getRandomColor(),
+                                name: getRandomWord(),
+                                speed: Math.random() * 100,
+                                time: getRandomTime(),
+                            };
+                            newUsers.push(user);
+                        }
+                        setUsers((prevUsers) => [...prevUsers, ...newUsers]);
+                        setIsLoading(false);
+                    }, 2000);
+                }
+            }
+        };
         const currentRef = leaderboardRef.current;
         if (currentRef) {
             currentRef.addEventListener('scroll', handleScroll);
@@ -112,6 +113,7 @@ const Leaderboard: React.FC = () => {
                 currentRef.removeEventListener('scroll', handleScroll);
             }
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
