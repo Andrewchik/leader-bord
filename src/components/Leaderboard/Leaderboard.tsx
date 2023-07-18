@@ -50,6 +50,7 @@ const Leaderboard: React.FC = () => {
         return colors[randomIndex];
     };
 
+// eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         setTimeout(() => {
             const generatedUsers: User[] = [];
@@ -73,6 +74,7 @@ const Leaderboard: React.FC = () => {
         }, 2000);
     }, []);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleScroll = useCallback(() => {
         if (leaderboardRef.current) {
             const { scrollTop, scrollHeight, clientHeight } = leaderboardRef.current;
@@ -98,6 +100,8 @@ const Leaderboard: React.FC = () => {
         }
     }, []);
 
+
+// eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         const currentRef = leaderboardRef.current;
         if (currentRef) {
