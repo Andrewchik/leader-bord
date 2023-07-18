@@ -108,7 +108,7 @@ const Leaderboard: React.FC = () => {
             setUsers(generatedUsers);
             setIsLoading(false);
         }, 2000);
-    }, [convertTimeToMilliseconds]);
+    }, [convertTimeToMilliseconds, getRandomColor, getRandomTime, getRandomWord]);
 
     return (
         <div className="leaderboard" ref={leaderboardRef}>
